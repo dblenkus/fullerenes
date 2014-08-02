@@ -5,9 +5,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-MAX_NODES = None
-MAX_PERIMETER = 19
-MAX_PENTAGONS = 5
+MAX_NODES = 78
+MAX_PERIMETER = None
+MAX_PENTAGONS = 12
 
 
 class Graph:
@@ -41,15 +41,16 @@ class Graph:
             self.add_pentagon(newBorder)
 
     def is_isomorphic(self, lst):
-        if type(lst) != list: lst = [lst]
+        if type(lst) != list:
+            lst = [lst]
 
         for g in lst:
-            if len(self.border) == len(g.border) and \
-               len(self.G.nodes()) == len(g.G.nodes()) and \
-               self.penta_n == g.penta_n and \
-               self.borderDeg2 == g.borderDeg2 and \
-               nx.is_isomorphic(self.G, g.G):
-                   return True
+            if (len(self.border) == len(g.border) and
+                len(self.G.nodes()) == len(g.G.nodes()) and
+                self.penta_n == g.penta_n and
+                self.borderDeg2 == g.borderDeg2 and
+                nx.is_isomorphic(self.G, g.G)):
+                    return True
 
         return False
 
@@ -110,14 +111,23 @@ def generate_graphs():
         graph = queue.pop(0)
 
         for g in process_graph(graph):
-            if MAX_PERIMETER and len(g.border) > MAX_PERIMETER: continue
-            if MAX_NODES and len(g.G.nodes()) > MAX_NODES: continue
-            if g.is_isomorphic(res): continue
+            if ((MAX_PERIMETER and len(g.border) > MAX_PERIMETER) or
+                (MAX_NODES and len(g.G.nodes()) > MAX_NODES) or
+                g.is_isomorphic(res)):
+                    continue
 
             queue.append(g)
             res.append(g)
 
         print("Queue length: {} Total: {}  \r".format(len(queue), len(res)), end="")
+
+    print("Filtering...")
+    i = len(res)
+    while i:
+        i -= 1
+        if ((MAX_NODES and len(res[i].G.nodes()) != MAX_NODES) or
+            (MAX_PERIMETER and len(res[i].border) != MAX_PERIMETER)):
+                res.pop(i)
 
     print()
     return res
@@ -132,4 +142,4 @@ for graph in graphs:
     graph.plot(os.path.join('results', 'graph_{}.png'.format(i)))
     i += 1
 duration = round(time.time()-start_time)
-print("\nTime: {}min {}s".format(round(duration//60), duration%60))
+print("\nTime: {}min {}s".format(round(duration // 60), duration % 60))
