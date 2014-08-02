@@ -97,9 +97,9 @@ while i<len(lst):
 res = 0
 for i, graph in enumerate(lst):
     nx.draw_spectral(graph.G)
-    plt.savefig("graf_"+ str(i) +".png")
+    plt.savefig("results/graf_"+ str(i) +".png")
     plt.clf()
-    print graph.G.nodes()
+    print(graph.G.nodes())
     for a in [x for x in graph.G.nodes() if graph.G.degree(x)==3]:
         tmp = 999
         for b in [x for x in graph.border if graph.G.degree(x)==2]:
@@ -107,5 +107,5 @@ for i, graph in enumerate(lst):
         if (tmp > res) and(not(tmp == 999)):
             res, res_i = tmp, i
 
-print res, res_i
+print(res, res_i)
 
