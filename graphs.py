@@ -104,7 +104,7 @@ def process_graph(graph):
 
 
 def generate_graphs():
-    print("Generating graphs...")
+    print "Generating graphs..."
     queue, res = [hexagon()], [hexagon()]
 
     while len(queue):
@@ -119,9 +119,9 @@ def generate_graphs():
             queue.append(g)
             res.append(g)
 
-        print("Queue length: {} Total: {}  \r".format(len(queue), len(res)), end="")
+        print "Queue length: {} Total: {}  \r".format(len(queue), len(res)),
 
-    print("Filtering...")
+    print "Filtering..."
     i = len(res)
     while i:
         i -= 1
@@ -129,17 +129,20 @@ def generate_graphs():
             (MAX_PERIMETER and len(res[i].border) != MAX_PERIMETER)):
                 res.pop(i)
 
-    print()
+    print ""
     return res
 
 
 start_time = time.time()
 graphs = generate_graphs()
-print("Graphs found: {}".format(len(graphs)))
+print "Graphs found: {}".format(len(graphs))
 i = 1
 for graph in graphs:
-    print("Plotting... {}\r".format(i), end="")
+    print "Plotting... {}\r".format(i),
     graph.plot(os.path.join('results', 'graph_{}.png'.format(i)))
     i += 1
+print ""
+for graph in graphs:
+    print graph
 duration = round(time.time()-start_time)
-print("\nTime: {}min {}s".format(round(duration // 60), duration % 60))
+print "\nTime: {}min {}s".format(round(duration / 60), duration % 60)
