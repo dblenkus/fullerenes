@@ -5,9 +5,9 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-MAX_NODES = 78
-MAX_PERIMETER = None
-MAX_PENTAGONS = 12
+MAX_NODES = None
+MAX_PERIMETER = 19
+MAX_PENTAGONS = 5
 
 
 class Graph:
@@ -119,7 +119,7 @@ def generate_graphs():
             queue.append(g)
             res.append(g)
 
-        print "Queue length: {} Total: {}  \r".format(len(queue), len(res)),
+        print "Queue length: {} Total: {}".format(len(queue), len(res))
 
     print "Filtering..."
     i = len(res)
@@ -129,7 +129,6 @@ def generate_graphs():
             (MAX_PERIMETER and len(res[i].border) != MAX_PERIMETER)):
                 res.pop(i)
 
-    print ""
     return res
 
 
@@ -138,10 +137,9 @@ graphs = generate_graphs()
 print "Graphs found: {}".format(len(graphs))
 i = 1
 for graph in graphs:
-    print "Plotting... {}\r".format(i),
+    print "Plotting... {}".format(i)
     graph.plot(os.path.join('results', 'graph_{}.png'.format(i)))
     i += 1
-print ""
 for graph in graphs:
     print graph
 duration = round(time.time()-start_time)
