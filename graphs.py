@@ -65,7 +65,6 @@ class Graph:
         plt.savefig(path)
         plt.clf()
 
-
     def __str__(self):
         return str(self.G.edges())
 
