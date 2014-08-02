@@ -119,15 +119,16 @@ def generate_graphs():
 
         print("Queue length: {} Total: {}  \r".format(len(queue), len(res)), end="")
 
+    print()
     return res
 
 
 start_time = time.time()
 graphs = generate_graphs()
 print("Graphs found: {}".format(len(graphs)))
-i = 0
+i = 1
 for graph in graphs:
-    print("Plotting... {}\r".format(i+1), end="")
+    print("Plotting... {}\r".format(i), end="")
     graph.plot(os.path.join('results', 'graph_{}.png'.format(i)))
     i += 1
 duration = round(time.time()-start_time)
