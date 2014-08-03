@@ -3,13 +3,15 @@ matplotlib.use('Agg')
 
 import os
 import time
+import multiprocessing
 
 import networkx as nx
 import matplotlib.pyplot as plt
 
 
-MAX_PERIMETER = 78
-MAX_PENTAGONS = 12
+MAX_WORKERS = 2
+MAX_PERIMETER = 19  # 78
+MAX_PENTAGONS = 5  # 12
 
 
 class Graph:
@@ -106,23 +108,59 @@ def process_graph(graph):
 
     return res
 
+def check_isomorphism(args):
+    lst, queue = args
+    res = []
+    for g in queue:
+        if not g.is_isomorphic(lst + res):
+            res.append(g)
+    return {len(queue[0].border): res}
+
 
 def generate_graphs():
     print "Generating graphs..."
-    queue, res = [hexagon()], [hexagon()]
+    queue, res = [hexagon()], {}
 
+    for i in range(MAX_PERIMETER):
+        res[i+1] = []
+    res[6] = [hexagon()]
+
+    p = multiprocessing.Pool(MAX_WORKERS)
+
+    itter = 0
     while len(queue):
-        graph = queue.pop(0)
+        itter += 1
+        print "Ittereation: {} ".format(itter)
 
-        for g in process_graph(graph):
-            if ((MAX_PERIMETER and len(g.border) > MAX_PERIMETER) or
-                g.is_isomorphic(res)):
-                    continue
+        lst = p.map(process_graph, queue)
 
-            queue.append(g)
-            res.append(g)
+        queue = {}
+        for i in range(MAX_PERIMETER):
+            queue[i+1] = []
 
-        print "Queue length: {} Total: {} Nodes: {} Perimeter: {} Pentagons: {}".format(len(queue), len(res), len(graph.G.nodes()), len(graph.border), graph.penta_n)
+        for graphs in lst:
+            for graph in graphs:
+                b_len = len(graph.border)
+                if MAX_PERIMETER and b_len <= MAX_PERIMETER:
+                    queue[b_len].append(graph)
+
+        tasks = []
+        for i in range(1, MAX_PERIMETER + 1):
+            if len(queue[i]):
+                tasks.append([res[i], queue[i]])
+
+        lst = p.map(check_isomorphism, tasks)
+
+        queue = []
+        for l in lst:
+            for k in l.keys():
+                res[k].extend(l[k])
+                queue.extend(l[k])
+
+    joined = []
+    for i in res.keys():
+        joined.extend(res[i])
+    res = joined
 
     print "Filtering..."
     i = len(res)
@@ -134,15 +172,16 @@ def generate_graphs():
     return res
 
 
-start_time = time.time()
-graphs = generate_graphs()
-print "Graphs found: {}".format(len(graphs))
-i = 1
-for graph in graphs:
-    print "Plotting... {}".format(i)
-    graph.plot(os.path.join('results', 'graph_{}.png'.format(i)))
-    i += 1
-for graph in graphs:
-    print graph
-duration = round(time.time()-start_time)
-print "\nTime: {}min {}s".format(round(duration / 60), duration % 60)
+if __name__ == '__main__':
+    start_time = time.time()
+    graphs = generate_graphs()
+    print "Graphs found: {}".format(len(graphs))
+    i = 1
+    for graph in graphs:
+        print "Plotting... {}".format(i)
+        graph.plot(os.path.join('results', 'graph_{}.png'.format(i)))
+        i += 1
+    for graph in graphs:
+        print graph
+    duration = round(time.time()-start_time)
+    print "\nTime: {}min {}s".format(round(duration / 60), duration % 60)
