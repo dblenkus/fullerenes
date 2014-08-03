@@ -8,9 +8,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-MAX_NODES = 78
-MAX_PERIMETER = None
-MAX_PENTAGONS = 12
+MAX_PERIMETER = 19
+MAX_PENTAGONS = 5
 
 
 class Graph:
@@ -47,12 +46,14 @@ class Graph:
         if type(lst) != list:
             lst = [lst]
 
-        for g in lst:
-            if (len(self.border) == len(g.border) and
-                len(self.G.nodes()) == len(g.G.nodes()) and
-                self.penta_n == g.penta_n and
-                self.borderDeg2 == g.borderDeg2 and
-                nx.is_isomorphic(self.G, g.G)):
+        i = len(lst)
+        while i:
+            i -= 1
+            if (len(self.border) == len(lst[i].border) and
+                len(self.G.nodes()) == len(lst[i].G.nodes()) and
+                self.penta_n == lst[i].penta_n and
+                self.borderDeg2 == lst[i].borderDeg2 and
+                nx.is_isomorphic(self.G, lst[i].G)):
                     return True
 
         return False
@@ -115,7 +116,6 @@ def generate_graphs():
 
         for g in process_graph(graph):
             if ((MAX_PERIMETER and len(g.border) > MAX_PERIMETER) or
-                (MAX_NODES and len(g.G.nodes()) > MAX_NODES) or
                 g.is_isomorphic(res)):
                     continue
 
@@ -128,9 +128,8 @@ def generate_graphs():
     i = len(res)
     while i:
         i -= 1
-        if ((MAX_NODES and len(res[i].G.nodes()) != MAX_NODES) or
-            (MAX_PERIMETER and len(res[i].border) != MAX_PERIMETER)):
-                res.pop(i)
+        if MAX_PERIMETER and len(res[i].border) != MAX_PERIMETER:
+            res.pop(i)
 
     return res
 
