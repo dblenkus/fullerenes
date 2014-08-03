@@ -122,7 +122,7 @@ def generate_graphs():
             queue.append(g)
             res.append(g)
 
-        print "Queue length: {} Total: {} Perimeter: {}".format(len(queue), len(res), len(graph.border))
+        print "Queue length: {} Total: {} Nodes: {} Perimeter: {} Pentagons: {}".format(len(queue), len(res), len(graph.G.nodes()), len(graph.border), graph.penta_n)
 
     print "Filtering..."
     i = len(res)
