@@ -8,8 +8,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-MAX_PERIMETER = 19
-MAX_PENTAGONS = 5
+MAX_PERIMETER = 78
+MAX_PENTAGONS = 12
 
 
 class Graph:
