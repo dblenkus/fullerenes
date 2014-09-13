@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg')  # needed to work on headless servers
 
 import os
 import time
@@ -8,8 +8,10 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-MAX_PERIMETER = 78
-MAX_PENTAGONS = 12
+PERIMETER_LIMIT = 13
+MAX_PERIMETER = 13
+MAX_PENTAGONS = 5
+TOUCHING_PENTAGONES = True
 
 
 class Graph:
@@ -99,10 +101,13 @@ def process_graph(graph):
             else:
                 penta_check = graph.border[end:] + graph.border[:start+1]
 
-            if len(set(penta_check) & set(graph.penta)) == 0:
-                new = graph.copy()
-                new.add_path(start, end, 5 - dist, penta=True)
-                res.append(new)
+            if (not TOUCHING_PENTAGONES and
+                    len(set(penta_check) & set(graph.penta)) != 0):
+                continue
+
+            new = graph.copy()
+            new.add_path(start, end, 5 - dist, penta=True)
+            res.append(new)
 
     return res
 
@@ -115,20 +120,25 @@ def generate_graphs():
         graph = queue.pop(0)
 
         for g in process_graph(graph):
-            if ((MAX_PERIMETER and len(g.border) > MAX_PERIMETER) or
+            if ((PERIMETER_LIMIT and len(g.border) > PERIMETER_LIMIT) or
                 g.is_isomorphic(res)):
                     continue
 
             queue.append(g)
             res.append(g)
 
-        print "Queue length: {} Total: {} Nodes: {} Perimeter: {} Pentagons: {}".format(len(queue), len(res), len(graph.G.nodes()), len(graph.border), graph.penta_n)
+            g.plot(os.path.join('tmp', 'graph_{}.png'.format(len(res))))
+
+        print ("Queue length: {} Total: {} Nodes: {} Perimeter: {} "
+            "Pentagons: {}".format(len(queue), len(res), len(graph.G.nodes()),
+                                   len(graph.border), graph.penta_n))
 
     print "Filtering..."
     i = len(res)
     while i:
         i -= 1
-        if MAX_PERIMETER and len(res[i].border) != MAX_PERIMETER:
+        if ((MAX_PERIMETER and len(res[i].border) != MAX_PERIMETER) or
+                (MAX_PENTAGONS and res[i].penta_n != MAX_PENTAGONS)):
             res.pop(i)
 
     return res
